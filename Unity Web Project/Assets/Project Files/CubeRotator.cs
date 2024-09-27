@@ -24,14 +24,17 @@ public class CubeRotator : MonoBehaviour
     public void leftrotate()
     {
         rotateSign = 1;
+        SendRotateSignToReact(rotateSign);
     }
     public void rightrotate()
     { 
-        rotateSign = -1;    
+        rotateSign = -1;
+        SendRotateSignToReact(rotateSign);
     }
     public void stoptrotate()
     {
         rotateSign = 0;
+        SendRotateSignToReact(rotateSign);
     }
     public static void sleftrotate()
     {
@@ -44,5 +47,11 @@ public class CubeRotator : MonoBehaviour
     public static void sstoptrotate()
     {
         cubeRotator.stoptrotate(); 
+    }
+
+    private void SendRotateSignToReact(float rotateSign)
+    { 
+        string js = $"window.parent.postMessage({{ type: 'UPDATE_ROTATESIGN', sign: {rotateSign} }}, '*');";
+        Application.ExternalEval(js);
     }
 }
