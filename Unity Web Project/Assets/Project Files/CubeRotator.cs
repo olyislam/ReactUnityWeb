@@ -11,6 +11,15 @@ public class CubeRotator : MonoBehaviour
 
     private void Start()
     {
+        Application.ExternalEval(@"
+        window.addEventListener('message', function(event){
+            if(event.data.type === 'CALL_UNITY_FUNCTION'){
+                SendMessage('CubeRotator', 'ReceiveDataFromReact', event.data.value);
+            }
+        });
+    ");
+
+
         cubeRotator = this;
         message.text = "Now it's ready to test";
         message.color = Color.green;
@@ -53,5 +62,10 @@ public class CubeRotator : MonoBehaviour
     { 
         string js = $"window.parent.postMessage({{ type: 'UPDATE_ROTATESIGN', sign: {rotateSign} }}, '*');";
         Application.ExternalEval(js);
+    }
+
+    private void ReceiveDataFromReact(float speedMultiplayer)
+    {
+        rotateSign *= speedMultiplayer;
     }
 }
