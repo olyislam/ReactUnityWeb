@@ -1,9 +1,19 @@
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class CubeRotator : JSMessenger
 {
+    public class SimpleHash
+    {
+        public string mesh;
+        public float px;
+        public float py;
+        public float pz;
+        public float rx;
+        public float ry;
+        public float rz;
+    }
+
     public float speed = 10;
     [SerializeField] private float rotateSign = 0;
 
@@ -13,6 +23,7 @@ public class CubeRotator : JSMessenger
     private void Start()
     {
         RegisterEventToReceiveData(nameof(ReceiveDataFromReact), "CALL_UNITY_FUNCTION");
+        RegisterEventToReceiveData(nameof(SpawnGameObject), "SpawnGameObject");
 
         cubeRotator = this;
         message.text = "Now it's ready to test";
@@ -25,7 +36,22 @@ public class CubeRotator : JSMessenger
     }
 
     private void ReceiveDataFromReact(object speedMultiplayer) => rotateSign *= (float)speedMultiplayer;
+    private void SpawnGameObject(object speedMultiplayer)
+    {
+        var json = speedMultiplayer as string;
+        Debug.Log("Unity Logging");
+        SendDataToReact(json, "Console_Log");
+        var h = JsonUtility.FromJson<SimpleHash>(json);
+        var mesh = h.mesh;
+        var pos = new Vector3((float)h.px, (float)h.py, h.pz);
+        var rot = Quaternion.Euler(new Vector3((float)h.rx, (float)h.ry, (float)h.rz));
 
+
+        if (mesh == "Cube")
+            GameObject.CreatePrimitive(PrimitiveType.Cube).transform.SetPositionAndRotation(pos, rot);
+        else
+            GameObject.CreatePrimitive(PrimitiveType.Cylinder).transform.SetPositionAndRotation(pos, rot);
+    }
     public void leftrotate()
     {
         rotateSign = 1;
