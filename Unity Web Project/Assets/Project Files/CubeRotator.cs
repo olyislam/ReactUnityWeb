@@ -1,7 +1,8 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CubeRotator : MonoBehaviour
+public class CubeRotator : JSMessenger
 {
     public float speed = 10;
     [SerializeField] private float rotateSign = 0;
@@ -11,14 +12,7 @@ public class CubeRotator : MonoBehaviour
 
     private void Start()
     {
-        Application.ExternalEval(@"
-        window.addEventListener('message', function(event){
-            if(event.data.type === 'CALL_UNITY_FUNCTION'){
-                SendMessage('CubeRotator', 'ReceiveDataFromReact', event.data.value);
-            }
-        });
-    ");
-
+        RegisterEventToReceiveData(nameof(ReceiveDataFromReact), "CALL_UNITY_FUNCTION");
 
         cubeRotator = this;
         message.text = "Now it's ready to test";
@@ -30,20 +24,22 @@ public class CubeRotator : MonoBehaviour
         transform.Rotate(0, rotateSign * speed * Time.deltaTime, 0);
     }
 
+    private void ReceiveDataFromReact(object speedMultiplayer) => rotateSign *= (float)speedMultiplayer;
+
     public void leftrotate()
     {
         rotateSign = 1;
-        SendRotateSignToReact(rotateSign);
+        SendDataToReact(rotateSign, "UPDATE_ROTATESIGN");
     }
     public void rightrotate()
     { 
         rotateSign = -1;
-        SendRotateSignToReact(rotateSign);
+        SendDataToReact(rotateSign, "UPDATE_ROTATESIGN");
     }
     public void stoptrotate()
     {
         rotateSign = 0;
-        SendRotateSignToReact(rotateSign);
+        SendDataToReact(rotateSign, "UPDATE_ROTATESIGN");
     }
     public static void sleftrotate()
     {
@@ -56,16 +52,5 @@ public class CubeRotator : MonoBehaviour
     public static void sstoptrotate()
     {
         cubeRotator.stoptrotate(); 
-    }
-
-    private void SendRotateSignToReact(float rotateSign)
-    { 
-        string js = $"window.parent.postMessage({{ type: 'UPDATE_ROTATESIGN', sign: {rotateSign} }}, '*');";
-        Application.ExternalEval(js);
-    }
-
-    private void ReceiveDataFromReact(float speedMultiplayer)
-    {
-        rotateSign *= speedMultiplayer;
     }
 }

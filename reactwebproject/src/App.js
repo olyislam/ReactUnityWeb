@@ -6,7 +6,7 @@ useEffect(()=>{
   const handleMessage = (event) =>{
     console.log(event.data);
     if(event.data.type === "UPDATE_ROTATESIGN"){
-      document.getElementById("rotateSign").innerHTML = "Rotate Sign:" + event.data.sign;
+      document.getElementById("rotateSign").innerHTML = "Rotate Sign:" + event.data.value;
     }
   };
 
@@ -15,6 +15,10 @@ useEffect(()=>{
      window.removeEventListener('message', handleMessage);
    }
 })
+
+
+
+
 
 const sendMessageToUnity = (value) => {
   const iframe = document.querySelector('iframe');
