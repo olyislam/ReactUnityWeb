@@ -55,7 +55,7 @@ const SpawnGameObject = ()=>{
         <button onClick={()=> sendEventDataToUnity('CALL_UNITY_FUNCTION', 2.0)}> Multiply Rotate Speed</button>
         <button onClick={SpawnGameObject}> Spawn Game Object</button>
         <p id="rotateSign">Rotate Sign: 0 </p>
-        <iframe src="http://localhost/UnityWebBuild/" width={1000} height={500} ></iframe>
+        <iframe src="../UnityWebBuild/index.html" width={1000} height={500} ></iframe>
       </header>
     </div>
   );
