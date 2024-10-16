@@ -17,13 +17,8 @@ public class ObjectSelectionTracker : MonoBehaviour
         this.selectedObject = selectedObject;
     }
 
-    protected virtual void OnSelectObject(GameObject selectedObject)
-    { 
-    
-    }
+    protected virtual void OnSelectObject(GameObject selectedObject) { }
 
-    protected virtual void OnDeselectObject(GameObject selectedObject)
-    {
+    protected virtual void OnDeselectObject(GameObject selectedObject) { }
 
-    }
 }

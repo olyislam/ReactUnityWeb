@@ -2,9 +2,11 @@ using UnityEngine;
 
 public abstract class ObjectManipulatorBase : ObjectSelectionTracker
 {
-
+    [SerializeField] private LayerMask raycastLayer;
     [SerializeField] private bool isPerforming = false;
-    protected ManipulatableObject targetObj;
+    protected ManipulatableObject manipulatableObj;
+
+    public bool IsPerforming => isPerforming;
     protected virtual void Update()
     {
         OnTickReadInput();
@@ -15,7 +17,7 @@ public abstract class ObjectManipulatorBase : ObjectSelectionTracker
     protected virtual bool GetMouseHitPoint(out Vector3 hitPoint)
     {
         var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        bool isGroundDetected = Physics.Raycast(ray, out RaycastHit hit);
+        bool isGroundDetected = Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, raycastLayer);
 
         hitPoint = hit.point;
         return isGroundDetected;
@@ -23,18 +25,22 @@ public abstract class ObjectManipulatorBase : ObjectSelectionTracker
 
     protected override void OnSelectObject(GameObject selectedObject)
     {
-        targetObj = selectedObject.GetComponent<ManipulatableObject>();
+        manipulatableObj = selectedObject.GetComponent<ManipulatableObject>();
         enabled = true;
         RealignInticator(selectedObject);
+        OnUpdateInticatorVisiblity(true);
     }
 
     protected override void OnDeselectObject(GameObject selectedObject)
     {
-        targetObj = null;
+        manipulatableObj = null;
+        selectedObject = null;
         enabled = false;
+        OnUpdateInticatorVisiblity(false);
     }
 
     protected abstract void RealignInticator(GameObject selectedObject);
+    protected abstract void OnUpdateInticatorVisiblity(bool show);
     protected abstract void OnTickReadInput();
 
     protected virtual void OnBeginValidInput()

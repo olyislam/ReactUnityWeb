@@ -2,12 +2,6 @@ using UnityEngine;
 
 public class ObjectTranslator : ObjectManipulatorBase
 {
-
-    public GameObject o;
-
-    private void Start() => UpdateSelection(o);
-
-
     private Vector3 clickOffset;
 
     protected override void OnSelectObject(GameObject selectedObject)
@@ -28,7 +22,7 @@ public class ObjectTranslator : ObjectManipulatorBase
         if (selectedObject == null)
             return;
 
-        if (!targetObj.IsMoveable)
+        if (!manipulatableObj.IsMoveable)
             return;
 
         if (Input.GetMouseButtonDown(0))
@@ -60,11 +54,18 @@ public class ObjectTranslator : ObjectManipulatorBase
 
     protected override void OnGoingValidInput()
     {
+        if (!Input.GetMouseButton(0))
+            return;
         if (GetMouseHitPoint(out Vector3 hitPoint))
         {
             hitPoint -= clickOffset;
             selectedObject.transform.position = hitPoint;
             transform.position = hitPoint;
         }
+    }
+
+    protected override void OnUpdateInticatorVisiblity(bool show)
+    {
+       
     }
 }

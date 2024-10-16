@@ -2,11 +2,6 @@ using UnityEngine;
 
 public class ObjectRotator : ObjectManipulatorBase
 {
-    public GameObject o;
-    private void Start() =>  UpdateSelection(o);
-    
-
-
     [SerializeField] float maxSelectionDistance = 0.5f;
     [SerializeField] private Renderer lF, lB, rF, rB;
 
@@ -16,11 +11,8 @@ public class ObjectRotator : ObjectManipulatorBase
     {
       base.OnSelectObject(selectedObject);
 
-        if (targetObj != null)
-        {
-            enabled = targetObj.IsRotatable;
-            transform.rotation = selectedObject.transform.rotation;
-        }
+        if (manipulatableObj != null)
+            enabled = manipulatableObj.IsRotatable;
         else
             enabled = false;
     }
@@ -29,19 +21,22 @@ public class ObjectRotator : ObjectManipulatorBase
     {
         transform.rotation = selectedObject.transform.rotation;
 
-        Vector3 selectedObjHalfScale = selectedObject.transform.localScale * 0.5f;
         Vector3 selectorScale = Vector3.one * maxSelectionDistance;
         lF.transform.localScale = selectorScale;
         lB.transform.localScale = selectorScale;
         rF.transform.localScale = selectorScale;
         rB.transform.localScale = selectorScale;
 
-        float AbsGroundOffset = Mathf.Abs(selectedObjHalfScale.y - selectorScale.y * 0.5f);
-        selectorScale *= 0.499f;
-        lF.transform.localPosition = transform.up * -AbsGroundOffset + transform.right * (selectedObjHalfScale.x + selectorScale.x) * -1 + transform.forward * (selectedObjHalfScale.z + selectorScale.z);
-        lB.transform.localPosition = transform.up * -AbsGroundOffset + transform.right * (selectedObjHalfScale.x + selectorScale.x) * -1 + transform.forward * (selectedObjHalfScale.z + selectorScale.z) * -1;
-        rF.transform.localPosition = transform.up * -AbsGroundOffset + transform.right * (selectedObjHalfScale.x + selectorScale.x) + transform.forward * (selectedObjHalfScale.z + selectorScale.z);
-        rB.transform.localPosition = transform.up * -AbsGroundOffset + transform.right * (selectedObjHalfScale.x + selectorScale.x) + transform.forward * (selectedObjHalfScale.z + selectorScale.z) * -1;
+        Vector3 halfScale = selectedObject.transform.localScale * 0.5f;
+   
+        float x = halfScale.x + selectorScale.x * 0.499f;
+        float y = halfScale.y - selectorScale.y * 0.5f;
+        float z = halfScale.z + selectorScale.z * 0.499f;
+
+        lF.transform.localPosition = new Vector3(-x, -y, z);
+        lB.transform.localPosition = new Vector3(-x, -y, -z);
+        rF.transform.localPosition = new Vector3(x, -y, z);
+        rB.transform.localPosition = new Vector3(x, -y, -z);
     }
 
     protected override void OnTickReadInput()
@@ -49,7 +44,7 @@ public class ObjectRotator : ObjectManipulatorBase
         if (selectedObject == null)
             return;
 
-        if (!targetObj.IsRotatable)
+        if (!manipulatableObj.IsRotatable)
             return;
 
         if (Input.GetMouseButtonDown(0))
@@ -117,5 +112,13 @@ public class ObjectRotator : ObjectManipulatorBase
     {
         hitPoint.y = lF.bounds.center.y;
         return cornerBound.Contains(hitPoint);
+    }
+
+    protected override void OnUpdateInticatorVisiblity(bool show)
+    {
+        lF.enabled = show;
+        lB.enabled = show;
+        rF.enabled = show;
+        rB.enabled = show;
     }
 }
